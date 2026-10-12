@@ -16,6 +16,7 @@
   --code-bg:#0d0906; --shadow:rgba(13,9,6,.45);
   --sim-bg:rgba(13,9,6,.55); --sim-grid:rgba(245,236,224,.08);
   --water:rgba(91,138,138,.55); --water-line:#8fc3c3; --ground:#5a3a26; --snow:#e9e4dc;
+  --key-bg:rgba(232,169,74,.10); --key-bd:#e8a94a;
   --succ-bg:rgba(138,154,74,.15); --succ-bd:rgba(138,154,74,.4);
   --warn-bg:rgba(217,98,43,.15); --warn-bd:rgba(217,98,43,.4);
   --info-bg:rgba(91,138,138,.15); --info-bd:rgba(91,138,138,.4);
@@ -38,6 +39,7 @@
   --code-bg:#fffaf3; --shadow:rgba(90,50,20,.14);
   --sim-bg:rgba(255,252,247,.8); --sim-grid:rgba(42,26,18,.08);
   --water:rgba(91,138,138,.35); --water-line:#2b6565; --ground:#c9a27c; --snow:#ffffff;
+  --key-bg:rgba(154,90,12,.07); --key-bd:#b8721a;
   --succ-bg:rgba(124,140,74,.14); --succ-bd:rgba(79,97,37,.4);
   --warn-bg:rgba(217,98,43,.12); --warn-bd:rgba(176,68,27,.4);
   --info-bg:rgba(91,138,138,.13); --info-bd:rgba(43,101,101,.4);
@@ -54,6 +56,7 @@
   --code-bg:#fffaf3; --shadow:rgba(90,50,20,.14);
   --sim-bg:rgba(255,252,247,.8); --sim-grid:rgba(42,26,18,.08);
   --water:rgba(91,138,138,.35); --water-line:#2b6565; --ground:#c9a27c; --snow:#ffffff;
+  --key-bg:rgba(154,90,12,.07); --key-bd:#b8721a;
   --succ-bg:rgba(124,140,74,.14); --succ-bd:rgba(79,97,37,.4);
   --warn-bg:rgba(217,98,43,.12); --warn-bd:rgba(176,68,27,.4);
   --info-bg:rgba(91,138,138,.13); --info-bd:rgba(43,101,101,.4);
@@ -227,6 +230,23 @@ input[type=range]{width:100%;accent-color:var(--amber);height:24px;cursor:pointe
 .zapis{display:flex;flex-wrap:wrap;gap:6px 22px}
 .zapis .f{font-size:1.12rem}
 @media (max-width:560px){.ex li{grid-template-columns:1fr;gap:4px}.ex{padding:16px}}
+/* zvýrazněná úloha na vyjádření neznámé */
+.ex-key{background:var(--key-bg);border:2px solid var(--key-bd);box-shadow:0 0 0 5px var(--key-bg),0 10px 30px var(--shadow);padding:24px}
+.ex-key .ex-head h3{font-size:1.25rem}
+.ex-key .star{width:26px;height:26px;flex-shrink:0;fill:var(--key-bd)}
+.b-key{background:var(--key-bd);color:var(--bg-top);border-color:transparent}
+.ex-key .rule{display:grid;gap:4px;padding:12px 14px;border-radius:var(--r-sm);border:1px dashed var(--key-bd);font-size:.97rem}
+.ex-key .rule strong{color:var(--amber-2)}
+.der{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.der .f{font-size:1.35rem}
+.der .op{font-family:var(--font-math);font-size:1.15rem;color:var(--rust);font-weight:600;padding:2px 10px;border-radius:var(--r-sm);background:var(--warn-bg);border:1px solid var(--warn-bd)}
+.why{color:var(--muted);font-size:.95rem;margin-top:4px}
+.ex li.fin{border-color:var(--key-bd)}
+.ex li.fin .der .f{color:var(--amber-2);font-size:1.5rem}
+.cx{text-decoration:line-through;text-decoration-color:var(--rust);text-decoration-thickness:2px;opacity:.75}
+.ex li.ans .v .f{font-size:1.3rem}
+.key-note{display:flex;gap:12px;align-items:center;padding:14px 18px;margin-bottom:36px;border-radius:var(--r-md);background:var(--key-bg);border:2px solid var(--key-bd)}
+.key-note svg{width:26px;height:26px;flex-shrink:0;fill:var(--key-bd)}
 @keyframes pop{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .ch-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:28px}
@@ -927,6 +947,90 @@ const CH=[
 }
 ];
 
+/* ---------- ÚLOHY NA VYJÁDŘENÍ NEZNÁMÉ ---------- */
+const cx=x=>`<span class="cx">${x}</span>`;
+function prodLines(lhs,fs,t){
+  const o=fs.filter(x=>x!==t), oj=o.join(D), oop=o.length>1?`(${oj})`:oj;
+  const num=fs.map(x=>o.includes(x)?cx(x):x).join(D), den=o.map(cx).join(D);
+  return [[`${lhs}${E}${fs.join(D)}`,`| : ${oop}`,`Hledané ${F(t)} je vynásobené ${o.length>1?'veličinami '+o.map(F).join(' a '):F(oj)}. Násobení zrušíme dělením – <strong>obě strany</strong> vydělíme ${F(oop)}.`],
+          [`${fr(lhs,oj)}${E}${fr(num,den)}`,'',`Vpravo je ${o.length>1?F(oj):F(oj)} nahoře i dole, takže se zkrátí (dělit číslo samo sebou dá 1).`],
+          [`${t}${E}${fr(lhs,oj)}`,'','Vpravo zůstalo samotné '+F(t)+'. Strany prohodíme, aby hledaná veličina byla vlevo.']];
+}
+function divLines(q,n,d){
+  return {a:[[`${q}${E}${fr(n,d)}`,`| · ${d}`,`Hledané ${F(n)} je <strong>děleno</strong> ${F(d)}. Dělení zrušíme násobením – <strong>obě strany</strong> vynásobíme ${F(d)}.`],
+             [`${q}${D}${d}${E}${fr(n+D+cx(d),cx(d))}`,'',`Vpravo je ${F(d)} nahoře i dole, takže se zkrátí.`],
+             [`${n}${E}${q}${D}${d}`,'','Prohodíme strany a máme výsledek.']],
+          b:[[`${n}${E}${q}${D}${d}`,`| : ${q}`,`Vyjdeme z výsledku a). Teď je ${F(d)} <strong>vynásobené</strong> ${F(q)}, proto obě strany vydělíme ${F(q)}.`],
+             [`${fr(n,q)}${E}${fr(cx(q)+D+d,cx(q))}`,'',`Vpravo se ${F(q)} zkrátí.`],
+             [`${d}${E}${fr(n,q)}`,'','Prohodíme strany a máme výsledek.']]};
+}
+const TIP_DIV=`Funguje to stejně jako s čísly: ${F('6 = 12 : 2')} → ${F('12 = 6 · 2')} a ${F('2 = 12 : 6')}.`;
+const TIP_PROD=`Funguje to stejně jako s čísly: ${F('20 = 2 · 10')} → ${F('2 = 20 : 10')} a ${F('10 = 20 : 2')}.`;
+const g_=I('g'), m_=I('m'), V_=I('V');
+const dv=divLines(r,m_,V_), dvv=divLines(I('v'),I('s'),I('t')), dp=divLines(I('p'),I('F'),I('S'));
+const KEY={
+ 'gravitacni-sila':{task:`Ze vzorce pro gravitační sílu ${F(`${Fg}${E}${m_}${D}${g_}`)} vyjádři a) hmotnost ${F(m_)}, b) gravitační konstantu ${F(g_)}.`,tip:TIP_PROD,
+   parts:[['a) hmotnost m',prodLines(Fg,[m_,g_],m_)],['b) konstanta g',prodLines(Fg,[m_,g_],g_)]],
+   check:`Zvol si čísla: ${F('m = 3 kg')}, ${F('g = 10 N/kg')}, pak ${F(Fg+' = 30 N')}. Zkouška: ${F('m = 30 : 10 = 3')} ✓ a ${F('g = 30 : 3 = 10')} ✓`,
+   res:[`${m_}${E}${fr(Fg,g_)}`,`${g_}${E}${fr(Fg,m_)}`]},
+ 'hustota':{task:`Ze vzorce pro hustotu ${F(`${r}${E}${fr(m_,V_)}`)} vyjádři a) hmotnost ${F(m_)}, b) objem ${F(V_)}.`,tip:TIP_DIV,
+   parts:[['a) hmotnost m',dv.a],['b) objem V',dv.b]],
+   check:`Zvol si čísla: ${F(r+' = 2 g/cm<sup>3</sup>')}, ${F('V = 5 cm<sup>3</sup>')}, pak ${F('m = 10 g')}. Zkouška: ${F('m = 2 · 5 = 10')} ✓ a ${F('V = 10 : 2 = 5')} ✓`,
+   res:[`${m_}${E}${r}${D}${V_}`,`${V_}${E}${fr(m_,r)}`]},
+ 'rychlost':{task:`Ze vzorce pro rychlost rovnoměrného pohybu ${F(`${I('v')}${E}${fr(I('s'),I('t'))}`)} vyjádři a) dráhu ${F(I('s'))}, b) čas ${F(I('t'))}.`,tip:TIP_DIV,
+   parts:[['a) dráha s',dvv.a],['b) čas t',dvv.b]],
+   check:`Zvol si čísla: ${F('s = 100 m')}, ${F('t = 20 s')}, pak ${F('v = 5 m/s')}. Zkouška: ${F('s = 5 · 20 = 100')} ✓ a ${F('t = 100 : 5 = 20')} ✓`,
+   res:[`${I('s')}${E}${I('v')}${D}${I('t')}`,`${I('t')}${E}${fr(I('s'),I('v'))}`]},
+ 'moment-sily':{task:`Ze vzorce pro moment síly ${F(`${I('M')}${E}${I('F')}${D}${I('a')}`)} vyjádři a) sílu ${F(I('F'))}, b) rameno ${F(I('a'))}.`,tip:TIP_PROD,
+   parts:[['a) síla F',prodLines(I('M'),[I('F'),I('a')],I('F'))],['b) rameno a',prodLines(I('M'),[I('F'),I('a')],I('a'))]],
+   check:`Zvol si čísla: ${F('F = 40 N')}, ${F('a = 0,5 m')}, pak ${F('M = 20 N·m')}. Zkouška: ${F('F = 20 : 0,5 = 40')} ✓ a ${F('a = 20 : 40 = 0,5')} ✓`,
+   res:[`${I('F')}${E}${fr(I('M'),I('a'))}`,`${I('a')}${E}${fr(I('M'),I('F'))}`]},
+ 'paka':{task:`Z podmínky rovnováhy na páce ${F(`${F1}${D}${a1}${E}${F2}${D}${a2}`)} vyjádři a) sílu ${F(F2)}, b) rameno ${F(a1)}.`,tip:'Tady jsou veličiny na obou stranách. Postup je ale stejný: zajímá nás jen to, čím je hledaná veličina vynásobená.',
+   parts:[['a) síla F₂',[[`${F1}${D}${a1}${E}${F2}${D}${a2}`,`| : ${a2}`,`Hledané ${F(F2)} je vpravo a je vynásobené ${F(a2)}. <strong>Obě strany</strong> vydělíme ${F(a2)}.`],
+                      [`${fr(F1+D+a1,a2)}${E}${fr(F2+D+cx(a2),cx(a2))}`,'',`Vpravo se ${F(a2)} zkrátí.`],
+                      [`${F2}${E}${fr(F1+D+a1,a2)}`,'','Prohodíme strany a máme výsledek.']]],
+          ['b) rameno a₁',[[`${F1}${D}${a1}${E}${F2}${D}${a2}`,`| : ${F1}`,`Hledané ${F(a1)} je vlevo a je vynásobené ${F(F1)}. <strong>Obě strany</strong> vydělíme ${F(F1)}.`],
+                      [`${fr(cx(F1)+D+a1,cx(F1))}${E}${fr(F2+D+a2,F1)}`,'',`Vlevo se ${F(F1)} zkrátí.`],
+                      [`${a1}${E}${fr(F2+D+a2,F1)}`,'','Hledaná veličina už je vlevo sama, nemusíme nic prohazovat.']]]],
+   check:`Zvol si čísla: ${F(F1+' = 30 N')}, ${F(a1+' = 20 cm')}, ${F(F2+' = 20 N')}, ${F(a2+' = 30 cm')} (600 = 600). Zkouška: ${F(F2+' = 30 · 20 : 30 = 20')} ✓ a ${F(a1+' = 20 · 30 : 30 = 20')} ✓`,
+   res:[`${F2}${E}${fr(F1+D+a1,a2)}`,`${a1}${E}${fr(F2+D+a2,F1)}`]},
+ 'tlak':{task:`Ze vzorce pro tlak ${F(`${I('p')}${E}${fr(I('F'),I('S'))}`)} vyjádři a) sílu ${F(I('F'))}, b) plochu ${F(I('S'))}.`,tip:TIP_DIV,
+   parts:[['a) síla F',dp.a],['b) plocha S',dp.b]],
+   check:`Zvol si čísla: ${F('F = 600 N')}, ${F('S = 2 m<sup>2</sup>')}, pak ${F('p = 300 Pa')}. Zkouška: ${F('F = 300 · 2 = 600')} ✓ a ${F('S = 600 : 300 = 2')} ✓`,
+   res:[`${I('F')}${E}${I('p')}${D}${I('S')}`,`${I('S')}${E}${fr(I('F'),I('p'))}`]},
+ 'hydraulika':{task:`Ze vztahu pro hydraulické zařízení ${F(`${fr(F1,S1)}${E}${fr(F2,S2)}`)} vyjádři a) sílu ${F(F2)}, b) plochu malého pístu ${F(S1)}.`,tip:'Část b) je nejtěžší úloha z celé prezentace: hledaná veličina je ve jmenovateli (dole). Nejdřív ji musíme dostat nahoru.',
+   parts:[['a) síla F₂',[[`${fr(F1,S1)}${E}${fr(F2,S2)}`,`| · ${S2}`,`Hledané ${F(F2)} je <strong>děleno</strong> ${F(S2)}. <strong>Obě strany</strong> vynásobíme ${F(S2)}.`],
+                      [`${fr(F1+D+S2,S1)}${E}${fr(F2+D+cx(S2),cx(S2))}`,'',`Vpravo se ${F(S2)} zkrátí.`],
+                      [`${F2}${E}${fr(F1+D+S2,S1)}`,'','Prohodíme strany a máme výsledek.']]],
+          ['b) plocha S₁',[[`${fr(F1,S1)}${E}${fr(F2,S2)}`,`| · ${S1}`,`${F(S1)} je ve jmenovateli. Abychom ho dostali „nahoru“, vynásobíme <strong>obě strany</strong> ${F(S1)}.`],
+                      [`${F1}${E}${fr(F2+D+S1,S2)}`,`| · ${S2}`,`Vlevo se ${F(S1)} zkrátilo a vpravo je teď nahoře. Zbavíme se ještě zlomku – obě strany vynásobíme ${F(S2)}.`],
+                      [`${F1}${D}${S2}${E}${F2}${D}${S1}`,`| : ${F2}`,`Teď je ${F(S1)} vynásobené ${F(F2)}, proto obě strany vydělíme ${F(F2)}.`],
+                      [`${S1}${E}${fr(F1+D+S2,F2)}`,'',`Vpravo se ${F(F2)} zkrátí, strany prohodíme.`]]]],
+   check:`Zvol si čísla: ${F(F1+' = 50 N')}, ${F(S1+' = 10 cm<sup>2</sup>')}, ${F(F2+' = 500 N')}, ${F(S2+' = 100 cm<sup>2</sup>')}. Zkouška: ${F(F2+' = 50 · 100 : 10 = 500')} ✓ a ${F(S1+' = 50 · 100 : 500 = 10')} ✓`,
+   res:[`${F2}${E}${fr(F1+D+S2,S1)}`,`${S1}${E}${fr(F1+D+S2,F2)}`]},
+ 'hydrostaticky-tlak':{task:`Ze vzorce pro hydrostatický tlak ${F(`${ph}${E}${I('h')}${D}${r}${D}${g_}`)} vyjádři a) hloubku ${F(I('h'))}, b) hustotu kapaliny ${F(r)}.`,tip:'Když je hledaná veličina vynásobená dvěma dalšími, vydělíme obě strany oběma najednou – celým součinem.',
+   parts:[['a) hloubka h',prodLines(ph,[I('h'),r,g_],I('h'))],['b) hustota ρ',prodLines(ph,[I('h'),r,g_],r)]],
+   check:`Zvol si čísla: ${F('h = 2 m')}, ${F(r+' = 1 000 kg/m<sup>3</sup>')}, pak ${F(ph+' = 20 000 Pa')}. Zkouška: ${F('h = 20 000 : (1 000 · 10) = 2')} ✓ a ${F(r+' = 20 000 : (2 · 10) = 1 000')} ✓`,
+   res:[`${I('h')}${E}${fr(ph,r+D+g_)}`,`${r}${E}${fr(ph,I('h')+D+g_)}`]},
+ 'hydrostaticka-tlakova-sila':{task:`Ze vzorce pro hydrostatickou tlakovou sílu ${F(`${Fh}${E}${I('S')}${D}${I('h')}${D}${r}${D}${g_}`)} vyjádři a) plochu ${F(I('S'))}, b) hloubku ${F(I('h'))}.`,tip:'Čtyři veličiny vypadají strašidelně, ale postup je pořád stejný: vydělíme vším, co hledanou veličinu násobí.',
+   parts:[['a) plocha S',prodLines(Fh,[I('S'),I('h'),r,g_],I('S'))],['b) hloubka h',prodLines(Fh,[I('S'),I('h'),r,g_],I('h'))]],
+   check:`Zvol si čísla: ${F('S = 0,2 m<sup>2</sup>')}, ${F('h = 0,5 m')}, voda, pak ${F(Fh+' = 1 000 N')}. Zkouška: ${F('S = 1 000 : (0,5 · 1 000 · 10) = 0,2')} ✓ a ${F('h = 1 000 : (0,2 · 1 000 · 10) = 0,5')} ✓`,
+   res:[`${I('S')}${E}${fr(Fh,I('h')+D+r+D+g_)}`,`${I('h')}${E}${fr(Fh,I('S')+D+r+D+g_)}`]},
+ 'vztlakova-sila':{task:`Ze vzorce pro vztlakovou sílu ${F(`${Fvz}${E}${V_}${D}${r}${D}${g_}`)} vyjádři a) objem ${F(V_)}, b) hustotu kapaliny ${F(r)}.`,tip:'Když je hledaná veličina vynásobená dvěma dalšími, vydělíme obě strany oběma najednou – celým součinem.',
+   parts:[['a) objem V',prodLines(Fvz,[V_,r,g_],V_)],['b) hustota ρ',prodLines(Fvz,[V_,r,g_],r)]],
+   check:`Zvol si čísla: ${F('V = 0,002 m<sup>3</sup>')}, voda ${F(r+' = 1 000 kg/m<sup>3</sup>')}, pak ${F(Fvz+' = 20 N')}. Zkouška: ${F('V = 20 : (1 000 · 10) = 0,002')} ✓ a ${F(r+' = 20 : (0,002 · 10) = 1 000')} ✓`,
+   res:[`${V_}${E}${fr(Fvz,r+D+g_)}`,`${r}${E}${fr(Fvz,V_+D+g_)}`]}
+};
+function keySteps(k){
+  const st=[];
+  k.parts.forEach(([name,lines])=>lines.forEach((l,j)=>st.push([j===0?name:`${name.slice(0,2)} krok ${j+1}`,
+    `<div class="der"><span class="f">${l[0]}</span>${l[1]?`<span class="op">${l[1]}</span>`:''}</div><div class="why">${l[2]}</div>`, j===lines.length-1?'fin':''])));
+  st.push(['Zkouška',k.check]);
+  st.push(['Výsledek',`<div class="der">${k.res.map(F).join('<span class="muted">a</span>')}</div>`]);
+  return st;
+}
+const STAR='<svg class="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg>';
+
 /* ---------- RENDER ---------- */
 const app=$('#app');
 const isDone=id=>store.get('done:'+id)==='1';
@@ -948,6 +1052,7 @@ function dashboard(){
     <div class="step"><b>4</b><strong>Dosazení</strong><span>Dosaď čísla a spočítej. Nezapomeň na jednotku.</span></div>
     <div class="step"><b>5</b><strong>Odpověď</strong><span>Celou větou. Dává výsledek smysl?</span></div>
   </section>`;
+  h+=`<div class="key-note">${STAR.replace('class="star"','')}<div><strong>Nejdůležitější:</strong> v každé kapitole je zvýrazněná úloha <strong>Vyjádři neznámou ze vzorce</strong> s postupem krok po kroku. Začni vždy jí.</div></div>`;
   GROUPS.forEach(g=>{
     const list=CH.map((c,i)=>({c,i})).filter(o=>o.c.group===g.id);
     h+=`<section class="group"><div class="group-head"><h2>${g.name}</h2><span class="muted">${g.desc}</span></div><div class="cards">`;
@@ -971,7 +1076,7 @@ function chapter(c){
      <div class="meta"><span class="eyebrow">Kapitola ${idx+1} · ${grp.name}</span><h1>${c.name}</h1><p class="muted">${c.short}</p></div>
      <div class="big">${F(c.formula)}</div>
    </section>
-   <nav class="subnav glass" aria-label="Části kapitoly"><a href="#" data-go="s-teorie">Teorie</a><a href="#" data-go="s-sim">Simulace</a><a href="#" data-go="s-nezn">Vyjádření neznámé</a><a href="#" data-go="s-pr">Řešené příklady</a></nav>
+   <nav class="subnav glass" aria-label="Části kapitoly"><a href="#" data-go="s-teorie">Teorie</a><a href="#" data-go="s-sim">Simulace</a><a href="#" data-go="s-nezn">Vyjádření neznámé</a><a href="#" data-go="ex-key">★ Vyjádři neznámou</a><a href="#" data-go="s-pr">Řešené příklady</a></nav>
 
    <section class="sec glass" id="s-teorie">
      <div class="sec-title"><h2>Teorie</h2></div>
@@ -1001,12 +1106,20 @@ function chapter(c){
    </section>
 
    <section class="sec glass" id="s-pr">
-     <div class="sec-title"><h2>Řešené příklady</h2><span class="muted">Nejdřív zkus počítat sama, pak odkrývej postup krok po kroku.</span></div>
-     <div class="examples">${c.examples.map((e,i)=>`
+     <div class="sec-title"><h2>Řešené příklady</h2><span class="muted">Nejdřív zkus počítat sama, pak odkrývej postup krok po kroku. Začni zvýrazněnou úlohou.</span></div>
+     <div class="examples">
+       <article class="ex ex-key" id="ex-key">
+         <div class="ex-head">${STAR}<h3>Vyjádři neznámou ze vzorce</h3><span class="badge b-key">Nejdůležitější úloha</span></div>
+         <p class="task">${KEY[c.id].task}</p>
+         <div class="rule"><span><strong>Zlaté pravidlo:</strong> hledaná veličina musí zůstat na jedné straně úplně sama. Co ji <strong>násobí</strong>, tím obě strany <strong>vydělíme</strong>. Co ji <strong>dělí</strong>, tím obě strany <strong>vynásobíme</strong>.</span><span class="muted">${KEY[c.id].tip}</span></div>
+         <ol>${keySteps(KEY[c.id]).map((s,j,a)=>`<li class="${s[2]||''}${j===a.length-1?' ans':''}" hidden><span class="k">${s[0]}</span><div class="v">${s[1]}</div></li>`).join('')}</ol>
+         <div class="actions"><button class="btn" type="button" data-act="next">Ukázat další krok</button><button class="btn sec-b" type="button" data-act="all">Celé řešení</button><button class="btn sec-b" type="button" data-act="hide" hidden>Skrýt řešení</button></div>
+       </article>
+       ${c.examples.map((e,i)=>`
        <article class="ex" data-ex="${i}">
          <div class="ex-head"><h3>Příklad ${i+1}</h3><span class="badge ${['b-succ','b-info','b-warn'][i]}"><span class="d"></span>${e.lvl}</span></div>
          <p class="task">${e.task}</p>
-         <ol>${e.steps.map((s,j)=>`<li ${j===e.steps.length-1?'class="ans"':''} hidden><span class="k">${s[0]}</span><div class="v">${s[1]}</div></li>`).join('')}</ol>
+         <ol>${e.steps.map((s,j)=>`<li class="${s[2]||''}${j===e.steps.length-1?' ans':''}" hidden><span class="k">${s[0]}</span><div class="v">${s[1]}</div></li>`).join('')}</ol>
          <div class="actions"><button class="btn" type="button" data-act="next">Ukázat další krok</button><button class="btn sec-b" type="button" data-act="all">Celé řešení</button><button class="btn sec-b" type="button" data-act="hide" hidden>Skrýt řešení</button></div>
        </article>`).join('')}</div>
    </section>
